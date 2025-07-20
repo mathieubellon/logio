@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronRight, Settings } from "lucide-react";
+import { ChevronDown, ChevronRight, Settings, ChevronsUpDown } from "lucide-react";
 
 interface AIModel {
   id: string;
@@ -203,23 +203,39 @@ export function AIPromptInput({
           {/* Model Selection */}
           <div className="space-y-2">
             <Label htmlFor="model-select">AI Model</Label>
-            <Select value={selectedModel} onValueChange={setSelectedModel}>
-              <SelectTrigger id="model-select">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className="w-full justify-between h-12 px-4 py-3"
+                >
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">{selectedModelInfo?.name}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {selectedModelInfo?.provider} • {selectedModelInfo?.description}
+                    </span>
+                  </div>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-full min-w-[300px] max-h-[400px] overflow-y-auto">
                 {AI_MODELS.map((model) => (
-                  <SelectItem key={model.id} value={model.id}>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{model.name}</span>
-                      <span className="text-xs text-muted-foreground">
+                  <DropdownMenuItem
+                    key={model.id}
+                    onClick={() => setSelectedModel(model.id)}
+                    className="py-3 px-4 cursor-pointer"
+                  >
+                    <div className="flex flex-col space-y-1">
+                      <span className="font-medium text-sm">{model.name}</span>
+                      <span className="text-xs text-muted-foreground leading-relaxed">
                         {model.provider} • {model.description}
                       </span>
                     </div>
-                  </SelectItem>
+                  </DropdownMenuItem>
                 ))}
-              </SelectContent>
-            </Select>
+              </DropdownMenuContent>
+            </DropdownMenu>
             {selectedModelInfo && (
               <p className="text-xs text-muted-foreground">
                 Selected: {selectedModelInfo.name} ({selectedModelInfo.provider})
@@ -245,18 +261,29 @@ export function AIPromptInput({
             <CollapsibleContent className="space-y-4 pt-4">
               <div className="space-y-2">
                 <Label htmlFor="system-prompt-select">System Prompt Template</Label>
-                <Select value={selectedSystemPrompt} onValueChange={handleSystemPromptChange}>
-                  <SelectTrigger id="system-prompt-select">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className="w-full justify-between h-11 px-4 py-2"
+                    >
+                      <span className="font-medium">{selectedSystemPrompt}</span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-full min-w-[250px] max-h-[300px] overflow-y-auto">
                     {DEFAULT_SYSTEM_PROMPTS.map((prompt) => (
-                      <SelectItem key={prompt.name} value={prompt.name}>
+                      <DropdownMenuItem
+                        key={prompt.name}
+                        onClick={() => handleSystemPromptChange(prompt.name)}
+                        className="py-2.5 px-4 cursor-pointer"
+                      >
                         {prompt.name}
-                      </SelectItem>
+                      </DropdownMenuItem>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
               
               <div className="space-y-2">
