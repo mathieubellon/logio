@@ -7,6 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown, ChevronRight, Settings } from "lucide-react";
 
 interface AIModel {
   id: string;
@@ -48,8 +51,39 @@ const AI_MODELS: AIModel[] = [
   }
 ];
 
+const DEFAULT_SYSTEM_PROMPTS = [
+  {
+    name: "Default",
+    prompt: "You are a helpful AI assistant. Provide clear, accurate, and helpful responses."
+  },
+  {
+    name: "Creative Writer",
+    prompt: "You are a creative writer. Write engaging, imaginative, and well-crafted content. Use vivid language and creative storytelling techniques."
+  },
+  {
+    name: "Code Assistant",
+    prompt: "You are a programming expert. Write clean, efficient, and well-documented code. Explain your reasoning and suggest best practices."
+  },
+  {
+    name: "Academic Tutor",
+    prompt: "You are an academic tutor. Explain complex concepts clearly, provide examples, and help with learning. Be patient and educational."
+  },
+  {
+    name: "Business Consultant",
+    prompt: "You are a business consultant. Provide strategic advice, analyze situations, and offer practical business solutions."
+  },
+  {
+    name: "Training Assistant",
+    prompt: "You are a nutrition and fitness expert. Analyze the user's input and return ONLY a valid JSON object with calorie estimates.\n\nCRITICAL: Your response must be ONLY valid JSON with no additional text.\n\nRequired JSON structure:\n{\n  \"caloriesIn\": 0,\n  \"caloriesOut\": 0,\n  \"age\": null,\n  \"weight\": null,\n  \"height\": null,\n  \"activityLevel\": null,\n  \"meals\": [{\"name\": \"Food Name\", \"calories\": 100, \"quantity\": \"1 serving\"}],\n  \"activities\": [{\"name\": \"Activity Name\", \"calories\": 50, \"duration\": \"10 minutes\"}]\n}\n\nInstructions:\n- caloriesIn: Sum of all food calories\n- caloriesOut: Sum of all activity calories\n- meals: Each item shows TOTAL calories for the full quantity consumed\n- activities: Each item shows TOTAL calories burned for the full duration\n- Use realistic calorie estimates based on typical portions and intensities\n- All numbers must be integers\n- Set age/weight/height/activityLevel to null if not mentioned\n- For activityLevel, use one of: \"sedentary\", \"light\", \"moderate\", \"active\", \"very_active\"\n- Use empty arrays [] if no food/activities mentioned"
+  },
+  {
+    name: "Custom",
+    prompt: ""
+  }
+];
+
 interface AIPromptInputProps {
-  onSubmit?: (text: string, response: string, model: string) => void;
+  onSubmit?: (text: string, response: string, model: string, systemPrompt: string) => void;
   placeholder?: string;
   title?: string;
   description?: string;
@@ -74,6 +108,9 @@ export function AIPromptInput({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [response, setResponse] = useState("");
   const [error, setError] = useState("");
+  const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPTS[0].prompt);
+  const [selectedSystemPrompt, setSelectedSystemPrompt] = useState("Default");
+  const [isSystemPromptOpen, setIsSystemPromptOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -85,6 +122,14 @@ export function AIPromptInput({
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
   const charCount = text.length;
   const isOverLimit = charCount > maxLength;
+
+  const handleSystemPromptChange = (promptName: string) => {
+    setSelectedSystemPrompt(promptName);
+    const prompt = DEFAULT_SYSTEM_PROMPTS.find(p => p.name === promptName);
+    if (prompt) {
+      setSystemPrompt(prompt.prompt);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!text.trim() || isOverLimit) return;
@@ -102,6 +147,7 @@ export function AIPromptInput({
         body: JSON.stringify({
           prompt: text,
           model: selectedModel,
+          systemPrompt: systemPrompt,
         }),
       });
 
@@ -112,7 +158,7 @@ export function AIPromptInput({
       }
 
       setResponse(data.response);
-      onSubmit?.(text, data.response, selectedModel);
+      onSubmit?.(text, data.response, selectedModel, systemPrompt);
       setText("");
       
     } catch (error) {
@@ -180,6 +226,55 @@ export function AIPromptInput({
               </p>
             )}
           </div>
+
+          {/* System Prompt Settings */}
+          <Collapsible open={isSystemPromptOpen} onOpenChange={setIsSystemPromptOpen}>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="w-full justify-between">
+                <div className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  <span>System Prompt Settings</span>
+                </div>
+                {isSystemPromptOpen ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label htmlFor="system-prompt-select">System Prompt Template</Label>
+                <Select value={selectedSystemPrompt} onValueChange={handleSystemPromptChange}>
+                  <SelectTrigger id="system-prompt-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DEFAULT_SYSTEM_PROMPTS.map((prompt) => (
+                      <SelectItem key={prompt.name} value={prompt.name}>
+                        {prompt.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="system-prompt-text">Custom System Prompt</Label>
+                <Textarea
+                  id="system-prompt-text"
+                  value={systemPrompt}
+                  onChange={(e) => setSystemPrompt(e.target.value)}
+                  placeholder="Define how the AI should behave and respond..."
+                  className="min-h-[100px] resize-none"
+                  disabled={isSubmitting}
+                />
+                <p className="text-xs text-muted-foreground">
+                  This prompt defines the AI&apos;s role and behavior for all interactions.
+                </p>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
 
           {/* Input Area */}
           <div className="space-y-2">
@@ -262,6 +357,11 @@ export function AIPromptInput({
               <Badge variant="secondary" className="text-xs">
                 {selectedModelInfo?.name}
               </Badge>
+              {systemPrompt && (
+                <Badge variant="outline" className="text-xs">
+                  Custom System Prompt
+                </Badge>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>

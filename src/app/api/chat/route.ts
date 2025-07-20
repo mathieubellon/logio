@@ -13,7 +13,7 @@ const models = {
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt, model } = await request.json();
+    const { prompt, model, systemPrompt } = await request.json();
 
     if (!prompt || !model) {
       return NextResponse.json(
@@ -31,9 +31,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Prepare the messages array with system prompt if provided
+    const messages = [];
+    
+    if (systemPrompt && systemPrompt.trim()) {
+      messages.push({
+        role: 'system' as const,
+        content: systemPrompt.trim()
+      });
+    }
+    
+    messages.push({
+      role: 'user' as const,
+      content: prompt
+    });
+
     const result = await generateText({
       model: selectedModel,
-      prompt,
+      messages,
       maxTokens: 1000,
     });
 
@@ -41,6 +56,7 @@ export async function POST(request: NextRequest) {
       response: result.text,
       model,
       usage: result.usage,
+      systemPrompt: systemPrompt || null,
     });
 
   } catch (error) {

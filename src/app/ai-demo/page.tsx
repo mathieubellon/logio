@@ -4,11 +4,12 @@ import { AIPromptInput } from "@/components/ai-prompt-input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function AIDemoPage() {
-  const handleAISubmit = (prompt: string, response: string, model: string) => {
+  const handleAISubmit = (prompt: string, response: string, model: string, systemPrompt: string) => {
     console.log("AI Demo Interaction:", {
       prompt,
       response,
       model,
+      systemPrompt,
       timestamp: new Date().toISOString()
     });
   };
@@ -19,7 +20,7 @@ export default function AIDemoPage() {
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold tracking-tight">AI Chat Demo</h1>
           <p className="text-xl text-muted-foreground">
-            Experience the power of AI with multiple models
+            Experience the power of AI with multiple models and custom system prompts
           </p>
         </div>
 
@@ -27,7 +28,7 @@ export default function AIDemoPage() {
         <AIPromptInput 
           onSubmit={handleAISubmit}
           title="AI Chat Interface"
-          description="Select an AI model and start chatting. Try different models to see how they respond!"
+          description="Select an AI model and start chatting. Try different models and system prompts to see how they respond!"
           placeholder="Ask me anything... Write a story, explain a concept, help with coding, or just chat!"
           maxLength={5000}
           showWordCount={true}
@@ -52,16 +53,16 @@ export default function AIDemoPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>⚡ Features</CardTitle>
-              <CardDescription>What makes this interface special</CardDescription>
+              <CardTitle>⚙️ System Prompts</CardTitle>
+              <CardDescription>Customize AI behavior and personality</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="text-sm space-y-1">
-                <p>• Real-time AI responses</p>
-                <p>• Model switching</p>
-                <p>• Character/word counting</p>
-                <p>• Error handling</p>
-                <p>• Keyboard shortcuts</p>
+                <p>• Pre-built templates</p>
+                <p>• Custom prompts</p>
+                <p>• Role-based responses</p>
+                <p>• Consistent behavior</p>
+                <p>• Collapsible settings</p>
               </div>
             </CardContent>
           </Card>
@@ -80,17 +81,20 @@ export default function AIDemoPage() {
                 <ul className="text-sm space-y-1 text-muted-foreground">
                   <li>• Be specific in your prompts</li>
                   <li>• Try different models for different tasks</li>
+                  <li>• Use system prompts to set AI personality</li>
                   <li>• Use Cmd+Enter for quick submission</li>
                   <li>• Check character limits for long prompts</li>
                 </ul>
               </div>
               <div className="space-y-3">
-                <h4 className="font-semibold">Model Recommendations:</h4>
+                <h4 className="font-semibold">System Prompt Ideas:</h4>
                 <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>• <strong>GPT-4:</strong> Complex reasoning, coding</li>
-                  <li>• <strong>Claude Opus:</strong> Creative writing, analysis</li>
-                  <li>• <strong>GPT-3.5:</strong> General chat, quick responses</li>
-                  <li>• <strong>Claude Haiku:</strong> Fast, cost-effective</li>
+                  <li>• <strong>Creative Writer:</strong> For storytelling and creative content</li>
+                  <li>• <strong>Code Assistant:</strong> For programming help</li>
+                  <li>• <strong>Academic Tutor:</strong> For learning and explanations</li>
+                  <li>• <strong>Business Consultant:</strong> For strategic advice</li>
+                  <li>• <strong>Training Assistant:</strong> For nutrition and fitness tracking</li>
+                  <li>• <strong>Custom:</strong> Define your own AI personality</li>
                 </ul>
               </div>
             </div>

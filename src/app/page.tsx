@@ -3,12 +3,13 @@
 import { AIPromptInput } from "@/components/ai-prompt-input";
 
 export default function Home() {
-  const handleAISubmit = (prompt: string, response: string, model: string) => {
+  const handleAISubmit = (prompt: string, response: string, model: string, systemPrompt: string) => {
     // Handle the AI response here
     console.log("AI Interaction:", {
       prompt,
       response,
       model,
+      systemPrompt,
       timestamp: new Date().toISOString()
     });
     
