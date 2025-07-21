@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -167,7 +167,7 @@ export function JsonSchemaBuilder({ onSchemaChange, onJsonPreviewChange }: JsonS
         if (field.children && field.children.length > 0) {
           baseSchema.items = generateFieldSchema(field.children[0]);
         } else {
-          baseSchema.items = { type: 'string' };
+          baseSchema.items = { type: 'string', description: 'Array item' };
         }
         break;
       case 'object':
@@ -176,9 +176,9 @@ export function JsonSchemaBuilder({ onSchemaChange, onJsonPreviewChange }: JsonS
           baseSchema.required = [];
           field.children.forEach(child => {
             if (child.required) {
-              baseSchema.required.push(child.name);
+              baseSchema.required!.push(child.name);
             }
-            baseSchema.properties[child.name] = generateFieldSchema(child);
+            baseSchema.properties![child.name] = generateFieldSchema(child);
           });
         }
         break;
@@ -197,7 +197,7 @@ export function JsonSchemaBuilder({ onSchemaChange, onJsonPreviewChange }: JsonS
     return example;
   };
 
-  const generateFieldExample = (field: JsonField): any => {
+  const generateFieldExample = (field: JsonField): unknown => {
     if (field.example) {
       return field.example;
     }
@@ -216,7 +216,7 @@ export function JsonSchemaBuilder({ onSchemaChange, onJsonPreviewChange }: JsonS
         return ['item1', 'item2'];
       case 'object':
         if (field.children && field.children.length > 0) {
-          const obj: any = {};
+          const obj: Record<string, unknown> = {};
           field.children.forEach(child => {
             obj[child.name] = generateFieldExample(child);
           });
