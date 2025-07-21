@@ -1,18 +1,16 @@
 "use client";
 
-import { AIPromptInput } from "@/components/ai-prompt-input";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Code } from "lucide-react";
+import { EnhancedAIPrompt } from "@/components/enhanced-ai-prompt";
 
 export default function Home() {
-  const handleAISubmit = (prompt: string, response: string, model: string, systemPrompt: string) => {
+  const handleAISubmit = (text: string, response: string, model: string, systemPrompt: string, jsonSchema?: string) => {
     // Handle the AI response here
     console.log("AI Interaction:", {
-      prompt,
+      prompt: text,
       response,
       model,
       systemPrompt,
+      jsonSchema,
       timestamp: new Date().toISOString()
     });
     
@@ -21,37 +19,21 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight">Logio AI</h1>
-          <p className="text-xl text-muted-foreground mb-6">
-            Chat with AI models - Choose between OpenAI and Anthropic
+    <div className="min-h-screen bg-background py-8 px-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground mb-4">Logio AI</h1>
+          <p className="text-xl text-muted-foreground">
+            Chat with AI models using structured JSON responses. Build custom schemas and get perfectly formatted data.
           </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/ai-demo">
-              <Button variant="outline" className="flex items-center gap-2">
-                <span>View AI Demo</span>
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/json-schema-demo">
-              <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                <Code className="h-4 w-4" />
-                <span>JSON Schema Builder</span>
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
         </div>
         
-        <AIPromptInput 
+        <EnhancedAIPrompt 
           onSubmit={handleAISubmit}
-          title="AI Chat Interface"
-          description="Select an AI model and ask anything. Get intelligent responses powered by the latest AI models."
+          title="AI Chat with JSON Schema"
+          description="Select an AI model, define JSON structure, and get structured responses"
           placeholder="Ask me anything... Write a story, explain a concept, help with coding, or just chat!"
-          maxLength={5000}
+          maxLength={8000}
           showWordCount={true}
           showCharCount={true}
           autoFocus={true}
